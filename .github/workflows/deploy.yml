@@ -20,7 +20,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.8
         with:
           host: ${{ secrets.AZURE_HOST }}
-          username: ubuntu
+          username: hngx
           key: ${{ secrets.AZURE_PRIVATE_KEY }}
           passphrase: ${{ secrets.AZURE_PASSPHRASE }}
           script: |
@@ -42,4 +42,3 @@ jobs:
             
             # Restart FastAPI service
             sudo systemctl restart fastapi
-
