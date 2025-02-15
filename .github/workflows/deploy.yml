@@ -40,3 +40,4 @@ jobs:
             sudo systemctl restart fastapi
           timeout: 300
           command_timeout: 300
+
