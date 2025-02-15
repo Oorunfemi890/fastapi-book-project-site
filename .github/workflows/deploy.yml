@@ -15,3 +15,21 @@ jobs:
       - name: Test SSH connection
         run: ssh -i ~/.ssh/deploy_key hngx@4.178.136.107 "echo Connected successfully!"
 
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.AZURE_HOST }}       # e.g., 4.178.136.107
+          username: hngx
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          # Uncomment and set if your key is passphrase-protected:
+          # passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          script: |
+            echo "Starting deployment..."
+            cd /home/ubuntu/fastapi-book-project-site
+            git stash
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements.txt
+            sudo systemctl restart fastapi
+          timeout: 300           # overall job timeout in seconds (adjust as needed)
+          command_timeout: 300   # timeout for each command
