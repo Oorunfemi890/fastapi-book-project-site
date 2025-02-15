@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -15,9 +18,15 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
+          # Use printf to preserve formatting of the private key
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "${{ secrets.AZURE_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Debug deploy_key file
+        run: |
+          ls -l ~/.ssh/deploy_key
+          wc -c ~/.ssh/deploy_key
 
       - name: Test SSH connection
         run: |
