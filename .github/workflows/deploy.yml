@@ -15,7 +15,9 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          cat <<'EOF' > ~/.ssh/deploy_key
+${{ secrets.DEPLOY_SSH_KEY }}
+EOF
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
 
@@ -25,10 +27,10 @@ jobs:
       - name: Deploy to Azure VM
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: ${{ secrets.AZURE_HOST }}       # e.g., 4.178.136.107
+          host: ${{ secrets.AZURE_HOST }}
           username: hngx
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}  # Include if your key is passphrase-protected
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
           script: |
             echo "Starting deployment..."
             cd /home/ubuntu/fastapi-book-project-site
@@ -37,6 +39,5 @@ jobs:
             source venv/bin/activate
             pip install -r requirements.txt
             sudo systemctl restart fastapi
-          timeout: 300           # Increase timeout if needed
+          timeout: 300
           command_timeout: 300
-
