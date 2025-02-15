@@ -15,6 +15,7 @@ jobs:
             host: ${{ secrets.AZURE_HOST }}
             username: ubuntu
             key: ${{ secrets.AZURE_PRIVATE_KEY }}
+             passphrase: ${{ secrets.SSH_PASSPHRASE }}
             script: |
                 cd fastapi-book-project
                 git stash
