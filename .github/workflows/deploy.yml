@@ -15,9 +15,7 @@ jobs:
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          cat <<'EOF' > ~/.ssh/deploy_key
-${{ secrets.DEPLOY_SSH_KEY }}
-EOF
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
 
@@ -41,3 +39,4 @@ EOF
             sudo systemctl restart fastapi
           timeout: 300
           command_timeout: 300
+
