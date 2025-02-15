@@ -28,7 +28,7 @@ jobs:
           host: ${{ secrets.AZURE_HOST }}       # e.g., 4.178.136.107
           username: hngx
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}
+          passphrase: ${{ secrets.DEPLOY_SSH_PASSPHRASE }}  # Include if your key is passphrase-protected
           script: |
             echo "Starting deployment..."
             cd /home/ubuntu/fastapi-book-project-site
@@ -37,22 +37,6 @@ jobs:
             source venv/bin/activate
             pip install -r requirements.txt
             sudo systemctl restart fastapi
-          timeout: 300           # Overall timeout in seconds
-          command_timeout: 300   # Command-specific timeout in seconds
+          timeout: 300           # Increase timeout if needed
+          command_timeout: 300
 
-      - name: Deploy to Azure VM
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.AZURE_HOST }}       # e.g., 4.178.136.107
-          username: hngx
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            echo "Starting deployment..."
-            cd /home/ubuntu/fastapi-book-project-site
-            git stash
-            git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart fastapi
-          timeout: 300           # overall timeout in seconds
-          command_timeout: 300   # command-specific timeout in seconds
