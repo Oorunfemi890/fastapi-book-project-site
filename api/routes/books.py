@@ -9,7 +9,7 @@ router = APIRouter()
 
 db = InMemoryDB()
 db.books = {
-B    1: Book(
+    1: Book(
         id=1,
         title="The Hobbit",
         author="J.R.R. Tolkien",
@@ -25,7 +25,7 @@ B    1: Book(
     ),
     3: Book(
         id=3,
- A       title="The Return of the King",
+        title="The Return of the King",
         author="J.R.R. Tolkien",
         publication_year=1955,
         genre=Genre.FANTASY,
@@ -37,49 +37,40 @@ B    1: Book(
 async def create_book(book: Book):
     db.add_book(book)
     return JSONResponse(
-B        status_code=status.HTTP_201_CREATED, content=book.model_dump()
+        status_code=status.HTTP_201_CREATED,
+        content=book.model_dump()
     )
 
-A
-@router.get(
-    "/", response_model=OrderedDict[int, Book], status_code=status.HTTP_200_OK
-)
+
+@router.get("/", response_model=OrderedDict[int, Book], status_code=status.HTTP_200_OK)
 async def get_books() -> OrderedDict[int, Book]:
     return db.get_books()
 
 
-
-@router.get("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)  # New endpoint
-async def get_book(book_id: int):
-    book = db.books.get(book_id)
- B   if not book:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
-# New endpoint to retrieve a single book by ID
 @router.get("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)
 async def get_book(book_id: int) -> Book:
     book = db.books.get(book_id)
     if not book:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
->>>>>>> b32da680c564e249350994c655f7798f31da34fb
             detail="Book not found"
         )
-    return book=
+    return book
+
 
 @router.put("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)
 async def update_book(book_id: int, book: Book) -> Book:
     updated = db.update_book(book_id, book)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=updated.model_dump(),
+        content=updated.model_dump()
     )
->>>>>>> b32da680c564e249350994c655f7798f31da34fb
 
 
 @router.delete("/{book_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(book_id: int) -> None:
     db.delete_book(book_id)
-    return JSONResponse(status_code=status.HTTP_204_NO_CONTENT, content=None)
-B
-B
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content=None
+    )
