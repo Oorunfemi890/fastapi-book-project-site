@@ -1,44 +1,17 @@
-name: CD - Deploy to Azure
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Add Server to Known Hosts
+      - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H 4.178.136.107 >> ~/.ssh/known_hosts
 
-      - name: Deploy to Azure VM
-        uses: appleboy/ssh-action@v0.1.8
-        with:
-          host: ${{ secrets.AZURE_HOST }}
-          username: hngx
-          key: ${{ secrets.AZURE_PRIVATE_KEY }}
-          passphrase: ${{ secrets.AZURE_PASSPHRASE }}
-          script: |
-            set -e  # Exit if any command fails
-            cd fastapi-book-project-site
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/deploy_key hngx@4.178.136.107 "echo Connected successfully!"
 
-            # Ensure repo is clean before pulling
-            git reset --hard
-            git pull origin main
-            
-            # Ensure virtual environment exists
-            if [ ! -d "venv" ]; then
-              python3 -m venv venv
-            fi
-
-            source venv/bin/activate
-            pip install --upgrade pip
-            pip install -r requirements.txt
-            
-            # Restart FastAPI service
-            sudo systemctl restart fastapi
