@@ -1,53 +1,27 @@
-name: Deploy
-
+name: CD - Deploy to Azure
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          # Use printf to preserve formatting of the private key
-          printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.AZURE_HOST }}" >> ~/.ssh/known_hosts
-
-      - name: Debug deploy_key file
-        run: |
-          ls -l ~/.ssh/deploy_key
-          wc -c ~/.ssh/deploy_key
-
-      - name: Test SSH connection
-        run: |
-          ssh -i ~/.ssh/deploy_key hngx@${{ secrets.AZURE_HOST }} "echo Connected successfully!"
-
-      - name: Deploy to Azure VM
+      - name: Checkout code
+        uses: actions/checkout@v3
+- name: Deploy to Azure vm
         uses: appleboy/ssh-action@v0.1.8
         with:
-          host: "${{ secrets.AZURE_HOST }}"
+          host: ${{ secrets.AZURE_HOST }}
           username: hngx
-          key: "${{ secrets.DEPLOY_SSH_KEY }}"
-          passphrase: "${{ secrets.DEPLOY_SSH_PASSPHRASE }}"
+          key: ${{ secrets.AZURE_PRIVATE_KEY }}
           script: |
-            echo "Starting deployment..."
-            cd /home/ubuntu/fastapi-book-project-site
+            cd fastapi-book-project-site
             git stash
             git pull origin main
-            source venv/bin/activate
-            pip install -r requirements.txt
-            sudo systemctl restart fastapi
-          timeout: 300
-          command_timeout: 300
+            # Stop existing containers
+            docker-compose down || true
+            docker-compose up -d --build
+            docker ps
 
 
