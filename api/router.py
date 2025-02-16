@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from api.routes import books, stage2_router  # Import both routers
+from api.routes.books import router as books_router
+from api.routes.stage2 import router as stage2_router  # Import directly from stage2.py
 
 api_router = APIRouter()
 
@@ -11,4 +12,5 @@ async def read_root():
 api_router.include_router(stage2_router, tags=["stage2"])
 
 # Include the books endpoint router
-api_router.include_router(books.router, prefix="/books", tags=["books"])
+api_router.include_router(books_router, prefix="/books", tags=["books"])
+
